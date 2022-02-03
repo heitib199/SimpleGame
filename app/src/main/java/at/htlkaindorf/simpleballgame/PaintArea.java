@@ -3,7 +3,6 @@ package at.htlkaindorf.simpleballgame;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -23,9 +22,11 @@ public class PaintArea extends SurfaceView implements SurfaceHolder.Callback {
     private boolean mousedown = false;
     private float startX = 0;
     private float startY = 0;
+    int actualLevel = 1;
 
     public PaintArea(Context context) {
         super(context);
+        SimpleLevelReader.readFile(this,getResources().openRawResource(R.raw.levels));
         getHolder().addCallback(this);
     }
 
@@ -54,7 +55,11 @@ public class PaintArea extends SurfaceView implements SurfaceHolder.Callback {
             ball.draw(canvas);
         }
     }
-
+    public void nextLevel(){
+        obstacles = SimpleLevelReader.getLevel(actualLevel);
+        balls.clear();
+        actualLevel = SimpleLevelReader.getNextLevelId(actualLevel);
+    }
     public ArrayList<SimpleGameObject> getBalls() {
         return balls;
     }
@@ -66,14 +71,8 @@ public class PaintArea extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder surfaceHolder) {
         Log.d(TAG, "surfaceCreated");
-        obstacles = new ArrayList<>();
-        obstacle = new Obstacle(this,300,500,500, 60, false);
-        obstacles.add(obstacle);
-        obstacle = new Obstacle(this,200,850,350, 200, false);
-        obstacles.add(obstacle);
-        obstacle = new Obstacle(this,250,850, 150,80, true);
-        obstacles.add(obstacle);
-        balls = new ArrayList<SimpleGameObject>();
+        balls = new ArrayList<>();
+        nextLevel();
         thread = new SimpleGameThread(this, surfaceHolder);
         thread.setRunning(true);
         thread.start();

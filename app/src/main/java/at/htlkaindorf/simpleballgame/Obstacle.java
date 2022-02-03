@@ -75,6 +75,7 @@ public class Obstacle {
             ArrayList<SimpleGameObject> list = paintArea.getBalls();
             list.remove(gameObject);
             paintArea.setBalls(list);
+            paintArea.nextLevel();
         }
     }
 
